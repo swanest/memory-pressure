@@ -8,17 +8,17 @@ describe("When monitoring memory pressure", function () {
     it("monitors", function (done) {
         this.timeout(400000);
         var buff = [], t = null, states = [];
-        pressure.on("underPressure", function (memoryUsage) {
+        pressure.default.on("underPressure", function (memoryUsage) {
             states.push(0);
             buff = [];
             setImmediate(global.gc);
             clearInterval(t);
         });
-        pressure.on("pressureReleased", function (memoryUsage) {
+        pressure.default.on("pressureReleased", function (memoryUsage) {
             states.push(1);
             setup();
         });
-        pressure.on("manualReleaseRequired", _.noop);
+        pressure.default.on("manualReleaseRequired", _.noop);
 
         function setup() {
             t = setInterval(function () {
