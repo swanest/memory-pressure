@@ -4,7 +4,7 @@
   "description": "Event emitter related to memory usage & pressure",
   "main": "lib/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec --expose-gc"
+    "test": "DEBUG=memory-pressure ./node_modules/.bin/mocha --reporter spec --expose-gc"
   },
   "repository": "https://github.com/swanest/memory-pressure",
   "author": "Cyri-l",
