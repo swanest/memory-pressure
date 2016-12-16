@@ -1,6 +1,6 @@
 {
   "name": "memory-pressure",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Event emitter related to memory usage & pressure",
   "main": "lib/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "homepage": "https://github.com/swanest/memory-pressure#readme",
   "dependencies": {
     "lodash": "^4.13.1",
-    "logger": "github:swanest/logger"
+    "sw-logger": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
