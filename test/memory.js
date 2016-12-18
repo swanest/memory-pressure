@@ -3,66 +3,57 @@ var _ = require("lodash");
 var expect = require("chai").expect;
 var fs = require("fs");
 
+process.title = "memory-pressure-test";
+
 describe("When monitoring memory pressure", function () {
+
+    pressure.new("default", {
+        memoryThreshold: 100 * 1000000,
+        consecutiveGrowths: 3,
+        interval: 200
+    });
+
 
     it("monitors", function (done) {
         this.timeout(400000);
-        var buff = [], t = null, states = [];
+        let buff = [], t = null, states = [], v = 0;
 
-        let v = 0;
 
-        pressure.new("default", {
-            stillUnderPressure: 1,
-            memoryThreshold: 50 * 1000000,
-            consecutiveGrowths: 3,
-            interval: 300
-        }); //Override
+        function increaseMemoryUsage() {
+            t = process.nextTick(function () {
+                setInterval(function () {
+                    buff.push(JSON.parse(fs.readFileSync(__dirname + "/data.json")));
+                }, 1)
+            });
+        };
 
-        pressure.default.on("underPressure", function (memoryUsage) {
+        function stopMemoryIncrease() {
+            clearInterval(t);
+        };
+
+        pressure.default.on(pressure.EVENTS.UNDER_PRESSURE, function (status) {
             states.push(0);
-
-            if (v > 0) {
-                buff = [];
-                setImmediate(global.gc);
-                clearInterval(t);
-            }
-
-            pressure.default.ack(); //Ready for next state
+            buff = [];
+            setImmediate(global.gc);
+            stopMemoryIncrease();
+            status.ack(); //Ready for next state
             v++;
         });
 
-        pressure.default.on("pressureReleased", function (memoryUsage) {
+        pressure.default.on(pressure.EVENTS.PRESSURE_RELEASED, function (status) {
             states.push(1);
-            setup();
-            pressure.default.ack(); //Ready for next state
+            increaseMemoryUsage();
+            status.ack(); //Ready for next state
         });
 
-        let stillUnderPressure = 0;
-        pressure.default.on("stillUnderPressure", function (memoryUsage) {
-            stillUnderPressure++;
-
-            buff = [];
-            setImmediate(global.gc);
-            clearInterval(t);
-
-            pressure.default.ack(); //Ready for next state
-        });
-
-        function setup() {
-            t = setInterval(function () {
-                buff.push(JSON.parse(fs.readFileSync(__dirname + "/data.json")));
-            }, 1);
-        };
-
-        setup();
+        increaseMemoryUsage();
 
         setTimeout(function () {
-            console.log(states);
-            expect(stillUnderPressure).to.equal(1);
             expect(states.length >= 2).to.be.ok;
             expect(states[0]).to.equal(0);
             expect(states[1]).to.equal(1);
             done();
         }, 5000);
+
     });
 });
