@@ -15,16 +15,15 @@ describe("When monitoring memory pressure", function () {
 
 
     it("monitors", function (done) {
-        this.timeout(400000);
+        this.timeout(10000);
         let buff = [], t = null, states = [], v = 0;
 
-
         function increaseMemoryUsage() {
-            t = process.nextTick(function () {
-                setInterval(function () {
-                    buff.push(JSON.parse(fs.readFileSync(__dirname + "/data.json")));
-                }, 1)
-            });
+            setInterval(function () {
+                fs.readFile(__dirname + "/data.json", function (err, contents) {
+                    buff.push(JSON.parse(contents));
+                });
+            }, 1)
         };
 
         function stopMemoryIncrease() {
@@ -40,6 +39,10 @@ describe("When monitoring memory pressure", function () {
             v++;
         });
 
+        pressure.default.on(pressure.EVENTS.UNDER_PRESSURE, function (status) {
+            status.ack(); //Ready for next state
+        });
+
         pressure.default.on(pressure.EVENTS.PRESSURE_RELEASED, function (status) {
             states.push(1);
             increaseMemoryUsage();
@@ -53,7 +56,8 @@ describe("When monitoring memory pressure", function () {
             expect(states[0]).to.equal(0);
             expect(states[1]).to.equal(1);
             done();
-        }, 5000);
+        }, 5000)
+
 
     });
 });
