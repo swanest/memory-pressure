@@ -1,8 +1,9 @@
 {
   "name": "memory-pressure",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Event emitter related to memory usage & pressure",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "DEBUG=memory-pressure ./node_modules/.bin/mocha --reporter spec --expose-gc"
   },
@@ -15,7 +16,9 @@
     "sw-logger": "^1.2.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.13.1",
     "chai": "^3.5.0",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "typescript": "^2.4.2"
   }
 }
