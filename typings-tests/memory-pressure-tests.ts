@@ -1,6 +1,6 @@
 import * as memoryPressure from '../lib';
 
-const instance = memoryPressure.new('blabla');
+const instance: memoryPressure.MemoryPressure = memoryPressure.new('blabla');
 instance.on(memoryPressure.EVENTS.PRESSURE_RELEASED, function () {
     console.log('Pressure released');
 });
